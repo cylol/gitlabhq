@@ -128,7 +128,13 @@ module Gitlab
 
         # merge the source branch into the satellite
         # will raise CommandFailed when merge fails
-        repo.git.merge(default_options({ no_ff: true }), "-m#{message}", "source/#{merge_request.source_branch}")
+
+        if merge_request.review.blank?
+          repo.git.merge(default_options({ no_ff: true }), "-m#{message}", "source/#{merge_request.source_branch}")
+        else
+          repo.git.merge(default_options({ no_ff: true }), "-m#{message}", merge_request.source_branch)
+        end
+
       rescue Grit::Git::CommandFailed => ex
         handle_exception(ex)
       end
@@ -136,7 +142,11 @@ module Gitlab
       # Assumes a satellite exists that is a fresh clone of the projects repo, prepares satellite for merges, diffs etc
       def update_satellite_source_and_target!(repo)
         repo.remote_add('source', merge_request.source_project.repository.path_to_repo)
-        repo.remote_fetch('source')
+        if merge_request.review.blank?
+          repo.remote_fetch('source')
+        else
+          repo.git.fetch({}, 'source', merge_request.review.ref)
+        end
         repo.git.checkout(default_options({ b: true }), merge_request.target_branch, "origin/#{merge_request.target_branch}")
       rescue Grit::Git::CommandFailed => ex
         handle_exception(ex)

@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source "https://ruby.taobao.org"
 
 def darwin_only(require_as)
   RUBY_PLATFORM.include?('darwin') && require_as
@@ -215,6 +215,8 @@ group :development do
 
   # thin instead webrick
   gem 'thin'
+
+  gem 'byebug'
 end
 
 group :development, :test do

@@ -35,6 +35,8 @@ class MergeRequest < ActiveRecord::Base
 
   has_one :merge_request_diff, dependent: :destroy
 
+  has_one :review
+
   after_create :create_merge_request_diff
   after_update :update_merge_request_diff
 
@@ -300,7 +302,8 @@ class MergeRequest < ActiveRecord::Base
   def source_branch_exists?
     return false unless self.source_project
 
-    self.source_project.repository.branch_names.include?(self.source_branch)
+    return self.source_project.repository.branch_names.include?(self.source_branch) if self.review.blank?
+    return self.source_project.repository.commit(source_branch).present?
   end
 
   def target_branch_exists?

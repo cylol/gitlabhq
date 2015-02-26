@@ -35,6 +35,8 @@ class PostReceive
 
       if tag?(ref)
         GitTagPushService.new.execute(project, @user, oldrev, newrev, ref)
+      elsif review?(ref)
+        GitReviewPushService.new.execute(project, @user, oldrev, newrev, ref)
       else
         GitPushService.new.execute(project, @user, oldrev, newrev, ref)
       end
@@ -49,5 +51,9 @@ class PostReceive
 
   def tag?(ref)
     !!(/refs\/tags\/(.*)/.match(ref))
+  end
+
+  def review?(ref)
+    !!(/refs\/reviews\/(.*)/.match(ref))
   end
 end

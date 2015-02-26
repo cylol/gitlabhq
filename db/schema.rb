@@ -11,10 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150213121042) do
-
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+ActiveRecord::Schema.define(version: 20150225035836) do
 
   create_table "application_settings", force: true do |t|
     t.integer  "default_projects_limit"
@@ -175,9 +172,9 @@ ActiveRecord::Schema.define(version: 20150213121042) do
 
   create_table "merge_request_diffs", force: true do |t|
     t.string   "state"
-    t.text     "st_commits"
-    t.text     "st_diffs"
-    t.integer  "merge_request_id", null: false
+    t.text     "st_commits",       limit: 2147483647
+    t.text     "st_diffs",         limit: 2147483647
+    t.integer  "merge_request_id",                    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -258,8 +255,8 @@ ActiveRecord::Schema.define(version: 20150213121042) do
     t.string   "line_code"
     t.string   "commit_id"
     t.integer  "noteable_id"
-    t.boolean  "system",        default: false, null: false
-    t.text     "st_diff"
+    t.boolean  "system",                           default: false, null: false
+    t.text     "st_diff",       limit: 2147483647
   end
 
   add_index "notes", ["author_id"], name: "index_notes_on_author_id", using: :btree
@@ -358,6 +355,15 @@ ActiveRecord::Schema.define(version: 20150213121042) do
 
   add_index "protected_branches", ["project_id"], name: "index_protected_branches_on_project_id", using: :btree
 
+  create_table "reviews", force: true do |t|
+    t.integer  "merge_request_id"
+    t.string   "ref"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "reviews", ["merge_request_id"], name: "index_reviews_on_merge_request_id", using: :btree
+
   create_table "services", force: true do |t|
     t.string   "type"
     t.string   "title"
@@ -374,15 +380,15 @@ ActiveRecord::Schema.define(version: 20150213121042) do
 
   create_table "snippets", force: true do |t|
     t.string   "title"
-    t.text     "content"
-    t.integer  "author_id",                    null: false
+    t.text     "content",          limit: 2147483647
+    t.integer  "author_id",                                       null: false
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "file_name"
     t.datetime "expires_at"
     t.string   "type"
-    t.integer  "visibility_level", default: 0, null: false
+    t.integer  "visibility_level",                    default: 0, null: false
   end
 
   add_index "snippets", ["author_id"], name: "index_snippets_on_author_id", using: :btree
